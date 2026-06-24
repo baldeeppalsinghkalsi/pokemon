@@ -1,121 +1,124 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import type { FormEvent } from 'react'
 import './App.css'
 
+type Pokemon = {
+  id: number
+  name: string
+  heightDecimetres: number
+  weightHectograms: number
+  types: string[]
+  abilities: string[]
+  baseStats: {
+    hp: number
+    attack: number
+    defense: number
+    'special-attack': number
+    'special-defense': number
+    speed: number
+  }
+  spriteUrl: string
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [name, setName] = useState('pikachu')
+  const [pokemon, setPokemon] = useState<Pokemon | null>(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const trimmedName = name.trim()
+    if (!trimmedName) {
+      setError('Please enter a Pokémon name.')
+      setPokemon(null)
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch(`/api/pokemon/${encodeURIComponent(trimmedName)}`)
+      if (!response.ok) {
+        throw new Error('Pokémon not found')
+      }
+
+      const data = (await response.json()) as Pokemon
+      setPokemon(data)
+    } catch (err) {
+      setPokemon(null)
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+    <main className="app-shell">
+      <section className="card">
+        <h1>Pokémon Lookup</h1>
+        <p>Enter a Pokémon name to fetch details from the backend API.</p>
+
+        <form onSubmit={handleSubmit} className="search-form">
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="e.g. pikachu"
+            aria-label="Pokémon name"
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+
+        {error ? <p className="error">{error}</p> : null}
+
+        {pokemon ? (
+          <article className="pokemon-card">
+            <div className="pokemon-header">
+              <div>
+                <h2>{pokemon.name}</h2>
+                <p>#{pokemon.id}</p>
+              </div>
+              <img src={pokemon.spriteUrl} alt={pokemon.name} />
+            </div>
+
+            <div className="pokemon-details">
+              <div>
+                <h3>Types</h3>
+                <p>{pokemon.types.join(', ')}</p>
+              </div>
+              <div>
+                <h3>Abilities</h3>
+                <p>{pokemon.abilities.join(', ')}</p>
+              </div>
+              <div>
+                <h3>Height</h3>
+                <p>{pokemon.heightDecimetres} dm</p>
+              </div>
+              <div>
+                <h3>Weight</h3>
+                <p>{pokemon.weightHectograms} hg</p>
+              </div>
+            </div>
+
+            <div className="stats">
+              <h3>Base Stats</h3>
+              <ul>
+                <li>HP: {pokemon.baseStats.hp}</li>
+                <li>Attack: {pokemon.baseStats.attack}</li>
+                <li>Defense: {pokemon.baseStats.defense}</li>
+                <li>Special Attack: {pokemon.baseStats['special-attack']}</li>
+                <li>Special Defense: {pokemon.baseStats['special-defense']}</li>
+                <li>Speed: {pokemon.baseStats.speed}</li>
+              </ul>
+            </div>
+          </article>
+        ) : null}
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
