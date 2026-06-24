@@ -65,8 +65,18 @@ function App() {
   return (
     <main className="app-shell">
       <section className="card">
+        {/* Authentic Pokédex Hardware Accents */}
+        <div className="pokedex-hardware">
+          <div className="big-blue-lens"></div>
+          <div className="mini-lights">
+            <div className="light red"></div>
+            <div className="light yellow"></div>
+            <div className="light green"></div>
+          </div>
+        </div>
+
         <h1>Pokédex</h1>
-        <p>Enter a Pokémon name to fetch details from the backend API.</p>
+        <p className="subtitle">Enter a name to query the mainframe database.</p>
 
         <form onSubmit={handleSubmit} className="search-form">
           <input
@@ -76,7 +86,7 @@ function App() {
             aria-label="Pokémon name"
           />
           <button type="submit" disabled={loading}>
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? '...' : 'Go'}
           </button>
         </form>
 
@@ -87,7 +97,7 @@ function App() {
             <div className="pokemon-header">
               <div>
                 <h2>{pokemon.name}</h2>
-                <p>#{pokemon.id}</p>
+                <p>Nº {String(pokemon.id).padStart(3, '0')}</p>
               </div>
               <img src={pokemon.spriteUrl} alt={pokemon.name} />
             </div>
@@ -103,23 +113,23 @@ function App() {
               </div>
               <div>
                 <h3>Height</h3>
-                <p>{pokemon.heightDecimetres} dm</p>
+                <p>{pokemon.heightDecimetres / 10} m</p>
               </div>
               <div>
                 <h3>Weight</h3>
-                <p>{pokemon.weightHectograms} hg</p>
+                <p>{pokemon.weightHectograms / 10} kg</p>
               </div>
             </div>
 
             <div className="stats">
               <h3>Base Stats</h3>
               <ul>
-                <li>HP: {pokemon.baseStats.hp}</li>
-                <li>Attack: {pokemon.baseStats.attack}</li>
-                <li>Defense: {pokemon.baseStats.defense}</li>
-                <li>Special Attack: {pokemon.baseStats['special-attack']}</li>
-                <li>Special Defense: {pokemon.baseStats['special-defense']}</li>
-                <li>Speed: {pokemon.baseStats.speed}</li>
+                <li><span>HP:</span> <span>{pokemon.baseStats.hp}</span></li>
+                <li><span>Attack:</span> <span>{pokemon.baseStats.attack}</span></li>
+                <li><span>Defense:</span> <span>{pokemon.baseStats.defense}</span></li>
+                <li><span>Sp. Atk:</span> <span>{pokemon.baseStats['special-attack']}</span></li>
+                <li><span>Sp. Def:</span> <span>{pokemon.baseStats['special-defense']}</span></li>
+                <li><span>Speed:</span> <span>{pokemon.baseStats.speed}</span></li>
               </ul>
             </div>
           </article>
