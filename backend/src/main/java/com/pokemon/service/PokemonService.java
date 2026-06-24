@@ -5,6 +5,13 @@ import com.pokemon.model.Pokemon;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.cache.annotation.Cacheable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.pokemon.config.CacheConfig.POKEMON_CACHE;
+
+
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PokemonService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PokemonService.class);
 
     private final RestClient restClient;
 
@@ -24,7 +33,11 @@ public class PokemonService {
                 .build();
     }
 
+    @Cacheable(value = POKEMON_CACHE, key = "#name.toLowerCase()")
     public Pokemon getPokemonByName(String name) {
+
+        logger.info("Cache MISS - fetching '{}' from PokeAPI", name);
+
         PokemonRawResponse raw;
         try {
             raw = restClient.get()
@@ -35,6 +48,7 @@ public class PokemonService {
             throw new IllegalArgumentException("Pokemon not found: " + name);
         }
 
+        assert raw != null;
         return mapToCleanModel(raw);
     }
 
