@@ -1,0 +1,14 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+.DS_Store
+HELP.md
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+coverage/
+*.log
