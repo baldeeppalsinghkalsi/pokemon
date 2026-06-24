@@ -40,9 +40,16 @@ function App() {
     setError('')
 
     try {
-      const response = await fetch(`/api/pokemon/${encodeURIComponent(trimmedName)}`)
+      const apiBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080' : '')
+      const response = await fetch(`${apiBase}/api/pokemon/${encodeURIComponent(trimmedName)}`)
+
       if (!response.ok) {
         throw new Error('Pokémon not found')
+      }
+
+      const contentType = response.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) {
+        throw new Error('The API returned an unexpected response.')
       }
 
       const data = (await response.json()) as Pokemon
@@ -58,7 +65,7 @@ function App() {
   return (
     <main className="app-shell">
       <section className="card">
-        <h1>Pokémon Lookup</h1>
+        <h1>Pokédex</h1>
         <p>Enter a Pokémon name to fetch details from the backend API.</p>
 
         <form onSubmit={handleSubmit} className="search-form">
