@@ -1,5 +1,6 @@
 package com.pokemon.controller;
 
+import com.pokemon.model.Pokemon;
 import com.pokemon.service.PokemonService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,14 +21,14 @@ public class PokemonController {
     }
 
     @GetMapping(value = "/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getPokemonByName(@PathVariable String name) {
+    public ResponseEntity<?> getPokemonByName(@PathVariable String name) {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body("{\"error\": \"name must not be blank\"}");
         }
 
         try {
-            String rawJson = pokemonService.getPokemonRawByName(name);
-            return ResponseEntity.ok(rawJson);
+            Pokemon pokemon = pokemonService.getPokemonByName(name);
+            return ResponseEntity.ok(pokemon);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("{\"error\": \"" + ex.getMessage() + "\"}");
