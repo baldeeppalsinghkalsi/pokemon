@@ -2,9 +2,7 @@ package com.pokemon.controller;
 
 import com.pokemon.model.Pokemon;
 import com.pokemon.service.PokemonService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,18 +21,11 @@ public class PokemonController {
     }
 
     @GetMapping(value = "/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getPokemonByName(@PathVariable String name) {
+    public Pokemon getPokemonByName(@PathVariable String name) {
         if (name == null || name.isBlank()) {
-            return ResponseEntity.badRequest().body("{\"error\": \"name must not be blank\"}");
+            throw new IllegalArgumentException("name must not be blank");
         }
-
-        try {
-            Pokemon pokemon = pokemonService.getPokemonByName(name);
-            return ResponseEntity.ok(pokemon);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("{\"error\": \"" + ex.getMessage() + "\"}");
-        }
+        return pokemonService.getPokemonByName(name);
     }
 
 }

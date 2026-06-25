@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.v2solutions</groupId>
+    <groupId>com</groupId>
     <artifactId>pokemon-search-engine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>pokemon-search-engine</name>

@@ -43,12 +43,27 @@ function App() {
       const apiBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080' : '')
       const response = await fetch(`${apiBase}/api/pokemon/${encodeURIComponent(trimmedName)}`)
 
+      const contentType = response.headers.get('content-type') || ''
+      const isJson = contentType.includes('application/json')
+
       if (!response.ok) {
-        throw new Error('Pokémon not found')
+        let message = 'Something went wrong'
+        if (isJson) {
+          try {
+            const body = (await response.json()) as { error?: string }
+            if (body.error) {
+              message = body.error
+            }
+          } catch {
+            // fall through to default message
+          }
+        } else if (response.status === 404) {
+          message = 'Pokémon not found'
+        }
+        throw new Error(message)
       }
 
-      const contentType = response.headers.get('content-type') || ''
-      if (!contentType.includes('application/json')) {
+      if (!isJson) {
         throw new Error('The API returned an unexpected response.')
       }
 
